@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function SearchForm({ query, setQuery, handleSubmit }) {
   return (
     <form className="search-form" onSubmit={handleSubmit}>

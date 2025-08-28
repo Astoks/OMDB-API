@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function MovieModal({ movie, close }) {
   
   if (!movie) return null;

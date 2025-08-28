@@ -10,7 +10,6 @@ export function useMovies(apiKey) {
   const [loadingMore, setLoadingMore] = useState(false); //Ξεχωριστο, για να μην εμφανιζεται το loading
   const [error, setError] = useState(null);
 
-  // Αναζήτηση νέας λέξης κλειδιού
   async function search(newQuery) {
     if (!newQuery.trim()) return;
 
@@ -29,7 +28,6 @@ export function useMovies(apiKey) {
     }
   }
 
-  // Φόρτωμα επόμενης σελίδας (infinite scroll)
   async function loadMore() {
     if (loadingMore || !query) return;
 
@@ -41,7 +39,6 @@ export function useMovies(apiKey) {
       const results = await fetchMovies(query, nextPage, apiKey);
 
       if (results?.length) {
-        // Φιλτράρουμε για να αποφύγουμε duplicates
         const uniqueResults = results.filter(
           movie => !movies.some(m => m.imdbID === movie.imdbID)
         );
@@ -55,7 +52,6 @@ export function useMovies(apiKey) {
     }
   }
 
-  // Επιλογή ταινίας για modal
   async function selectMovie(id) {
     try {
       setLoading(true);

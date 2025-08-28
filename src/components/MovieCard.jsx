@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function MovieCard({ movie, onClick }) {
   return (
     <div className="movie-card" onClick={() => onClick(movie.imdbID)}>
