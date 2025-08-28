@@ -1,9 +1,10 @@
-export async function fetchMovies(query, apiKey) {
+export async function fetchMovies(query, page = 1, apiKey) {
   if (!query.trim()) return [];
   const res = await fetch(
-    `https://www.omdbapi.com/?apikey=${apiKey}&s=${encodeURIComponent(query)}&type=movie`
+    `https://www.omdbapi.com/?apikey=${apiKey}&s=${encodeURIComponent(query)}&type=movie&page=${page}`
   );
   const data = await res.json();
+  console.log("Fetching:", query, "page:", page, "results:", data.Search?.length);
   return data.Response === "True" ? data.Search : [];
 }
 

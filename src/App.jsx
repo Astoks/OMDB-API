@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useEffect } from "react";
 import './App.css';
 import SearchForm from './components/SearchForm';
 import MovieList from './components/MovieList';
@@ -9,7 +10,17 @@ const API_KEY = "416220b8";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const { movies, selectedMovie, search, selectMovie, setSelectedMovie } = useMovies(API_KEY);
+  const { movies, selectedMovie, search, loadMore, selectMovie, setSelectedMovie } = useMovies(API_KEY);
+
+  useEffect(() => {
+    function handleScroll() {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+        loadMore();
+      }
+    }
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [loadMore]);
 
   function handleSubmit(e) {
     e.preventDefault();     
