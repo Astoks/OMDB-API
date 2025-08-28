@@ -4,41 +4,78 @@ import { fetchMovies, fetchMovieDetails } from '../utils/api';
 export function useMovies(apiKey) {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [page,setPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false); //Ξεχωριστο, για να μην εμφανιζεται το loading
+  const [error, setError] = useState(null);
 
-  async function search(query) {
-    setQuery(query);
-    setPage(1);
-    const results = await fetchMovies(query, 1, apiKey);
-    setMovies(results || []);
-  };
+  // Αναζήτηση νέας λέξης κλειδιού
+  async function search(newQuery) {
+    if (!newQuery.trim()) return;
 
-  async function loadMore() {
-    if (isLoading) return;
-    setIsLoading(true);
-    
-    const nextPage = page + 1;
-    const results = await fetchMovies(query, nextPage, apiKey);
-    if (results?.length) {
-      setMovies(prev => {
-        const newMovies = results.filter(
-          movie => !prev.some(m => m.imdbID === movie.imdbID)
-        );
-        return [...prev, ...newMovies];
-      });
+    try {
+      setLoading(true);
+      setError(null);
+      setQuery(newQuery);
+      setPage(1);
 
-      setPage(nextPage);
+      const results = await fetchMovies(newQuery, 1, apiKey);
+      setMovies(results || []);
+    } catch (err) {
+      setError("Something went wrong while fetching movies.");
+    } finally {
+      setLoading(false);
     }
-
-    setIsLoading(false);
   }
 
-  async function selectMovie (id) {
-    const details = await fetchMovieDetails(id, apiKey);
-    setSelectedMovie(details);
-  };
+  // Φόρτωμα επόμενης σελίδας (infinite scroll)
+  async function loadMore() {
+    if (loadingMore || !query) return;
 
-  return { movies, selectedMovie, search, loadMore, selectMovie, setSelectedMovie };
+    try {
+      setLoadingMore(true);
+      setError(null);
+
+      const nextPage = page + 1;
+      const results = await fetchMovies(query, nextPage, apiKey);
+
+      if (results?.length) {
+        // Φιλτράρουμε για να αποφύγουμε duplicates
+        const uniqueResults = results.filter(
+          movie => !movies.some(m => m.imdbID === movie.imdbID)
+        );
+        setMovies(prev => [...prev, ...uniqueResults]);
+        setPage(nextPage);
+      }
+    } catch (err) {
+      setError("Something went wrong while loading more movies.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }
+
+  // Επιλογή ταινίας για modal
+  async function selectMovie(id) {
+    try {
+      setLoading(true);
+      const details = await fetchMovieDetails(id, apiKey);
+      setSelectedMovie(details);
+    } catch (err) {
+      setError("Could not fetch movie details.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return {
+    movies,
+    selectedMovie,
+    loading,
+    error,
+    search,
+    loadMore,
+    selectMovie,
+    setSelectedMovie
+  };
 }

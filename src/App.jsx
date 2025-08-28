@@ -10,7 +10,7 @@ const API_KEY = "416220b8";
 
 export default function App() {
   const [query, setQuery] = useState("");
-  const { movies, selectedMovie, search, loadMore, selectMovie, setSelectedMovie } = useMovies(API_KEY);
+  const { movies, selectedMovie, loading, error, search, loadMore, selectMovie, setSelectedMovie } = useMovies(API_KEY);
 
   useEffect(() => {
     function handleScroll() {
@@ -20,7 +20,7 @@ export default function App() {
     }
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [loadMore]);
+  }, [loadMore, loading]);
 
   function handleSubmit(e) {
     e.preventDefault();     
@@ -32,9 +32,18 @@ export default function App() {
 
       <h1>🎬 Movie Explorer</h1>
 
-      <SearchForm query={query} setQuery={setQuery} handleSubmit={handleSubmit} />
+      <SearchForm 
+        query={query} 
+        setQuery={setQuery} 
+        handleSubmit={handleSubmit} 
+      />
 
-      <MovieList movies={movies} fetchMovieDetails={selectMovie} />
+      <MovieList 
+        movies={movies} 
+        fetchMovieDetails={selectMovie} 
+        loading={loading} 
+        error={error}  
+      />
 
       {selectedMovie && <MovieModal movie={selectedMovie} close={() => setSelectedMovie(null)} />}
 

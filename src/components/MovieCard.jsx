@@ -5,17 +5,13 @@ export default function MovieCard({ movie, onClick }) {
     <div className="movie-card" onClick={() => onClick(movie.imdbID)}>
       <img
         className="movie-poster"
-        src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/300x445?text=No+Image"}
+        src={movie.Poster && movie.Poster !== "N/A" ? movie.Poster : "/images/no-image.png"}
         alt={movie.Title}
+        onError={(e) => e.target.src = "/images/no-image.png"}
       />
       <div className="movie-info">
         <div className="movie-title">{movie.Title}</div>
         <div className="movie-year">{movie.Year}</div>
-        {movie.Ratings?.[0] && (
-          <p className="movie-rating">
-            ⭐ {movie.Ratings[0].Source}: {movie.Ratings[0].Value}
-          </p>
-        )}
       </div>
     </div>
   );
